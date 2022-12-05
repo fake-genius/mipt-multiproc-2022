@@ -10,14 +10,27 @@ public class Main {
         }
         System.out.println();
     }
+
+    public static void measureSort(ForkJoinPool pool, boolean seq, int[] arr, String type) {
+        QuickSort qs = new QuickSort(0, arr.length - 1, arr);
+        long start_t = System.currentTimeMillis();
+        if (seq)
+            qs.seqImpl(0, arr.length - 1, arr);
+        else
+            pool.invoke(qs);
+        long end_t = System.currentTimeMillis();
+        double work_t = (end_t - start_t) / 1000.0;
+        System.out.println(type + " time for array of size " + arr.length + ": " + work_t + "s. ");
+    }
+
     public static void main(String[] args) {
-        int N = 100000000;
+        int N = 300000000;
         int[] arr_tmp0 = {19, 4, 6, 34, 100, 7, 1, 3, 9, 2, 5, 3, 4, 6};
         int[] arr_tmp1 = arr_tmp0.clone();
 
         Random random = new Random();
-        int[] arr0 = random.ints(N / 10, 10,N / 2).toArray();
-        int[] arr1 = random.ints(N, 10,N / 2).toArray();
+        int[] arr0 = random.ints(N / 10, 10,N / 1000).toArray();
+        int[] arr1 = random.ints(N, 10,N / 1000).toArray();
         int[] arr2 = arr1.clone();
 
         ForkJoinPool poolPar = new ForkJoinPool(4);
@@ -31,21 +44,9 @@ public class Main {
 
 
         QuickSort qs0 = new QuickSort(0, arr0.length - 1, arr0);
-        QuickSort qs1 = new QuickSort(0, arr1.length - 1, arr1);
-        QuickSort qs2 = new QuickSort(0, arr2.length - 1, arr2);
+        poolPar.invoke(qs0); //warm up
 
-        //poolPar.invoke(qs0);
-
-        long start_par = System.currentTimeMillis();
-        poolPar.invoke(qs2);
-        long end_par = System.currentTimeMillis();
-        double work_time_par = (end_par - start_par) / 1000.0;
-        System.out.println("Parallel time for array of size " + N + ": " + work_time_par + "s. ");
-
-        long start_seq = System.currentTimeMillis();
-        qs1.seqImpl(0, arr1.length - 1, arr1);
-        long end_seq = System.currentTimeMillis();
-        double work_time_seq = (end_seq - start_seq) / 1000.0;
-        System.out.println("Sequential time for array of size " + N + ": " + work_time_seq + "s. ");
+        measureSort(poolPar, true, arr1, "Sequential");
+        measureSort(poolPar, false, arr2, "Parallel");
     }
 }
