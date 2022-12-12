@@ -1,8 +1,5 @@
-import java.io.*;
 import java.util.*;
 
-// This class represents a directed graph using adjacency list
-// representation
 class Graph
 {
     int[][] adj;
@@ -36,22 +33,12 @@ class Graph
 
         if (IS_CUBE) {
             int x = v % S, y = (v / S) % S, z = (v / S) / S;
-            for (int i = 0; i <= 1; ++i) {
-                for (int j = 0; j <= 1; ++j) {
-                    for (int k = 0; k <= 1; ++k) {
-                        if (i + j + k > 1)
-                            continue;
-                        int x1 = x + i;
-                        int y1 = y + j;
-                        int z1 = z + k;
-
-                        if (x1 >= S || y1 >= S || z1 >= S)
-                            continue;
-
-                        neighbours.add(cube[x1][y1][z1]);
-                    }
-                }
-            }
+            if (x + 1 < S)
+                neighbours.add(cube[x + 1][y][z]);
+            if (y + 1 < S)
+                neighbours.add(cube[x][y + 1][z]);
+            if (z + 1 < S)
+                neighbours.add(cube[x][y][z + 1]);
             return neighbours;
         }
 

@@ -14,14 +14,29 @@ public class Main {
 
     public static void main(String[] args) {
         int S = 500;
-        Graph graphSeq = new Graph(S);
+        Graph graph = new Graph(S);
+        BFSParallel bfsWarmUp = new BFSParallel(new Graph(200));
+        bfsWarmUp.bfs(0);
 
-        BFSSequential bfsSeq = new BFSSequential(graphSeq);
+        mainSeq(graph, S);
+        mainPar(graph, S);
+    }
 
+    public static void mainSeq(Graph graph, int S) {
+        BFSSequential bfsSeq = new BFSSequential(graph);
         long startSeq = System.nanoTime();
         bfsSeq.bfs(0);
         long endSeq = System.nanoTime();
         validate(bfsSeq.getDistances(), S);
         System.out.println("Sequential worked for " + (endSeq - startSeq) / 1000000 + "ms");
+    }
+
+    public static void mainPar(Graph graph, int S) {
+        BFSParallel bfsPar = new BFSParallel(graph);
+        long startPar = System.nanoTime();
+        bfsPar.bfs(0);
+        long endPar = System.nanoTime();
+        validate(bfsPar.getDistances(), S);
+        System.out.println("Parallel worked for " + (endPar - startPar) / 1000000 + "ms");
     }
 }
